@@ -1,0 +1,47 @@
+{
+  "iconDefinitions": {
+    "_eo": {
+      "iconPath": "./eo.png"
+    },
+    "_py":{
+      "iconPath": "./python.png"
+    },
+    "_js":{
+      "iconPath": "./java-script.png"
+    },
+    "_html":{
+      "iconPath": "./text.png"
+    },
+    "_css":{
+      "iconPath": "./css-3.png"
+    },
+    "_java":{
+      "iconPath": "./java.png"
+    },
+    "_json":{
+      "iconPath": "./code.png"
+    },
+    "_cs":{
+      "iconPath": "c-sharp.png"
+    },
+    "_cpp":{
+      "iconPath": "c.png"
+    },
+    "_go":{
+      "iconPath": "go.png"
+    }
+  },
+
+  "fileExtensions": {
+    "eo": "_eo",
+    "py":"_py",
+    "js":"_js",
+    "html":"_html",
+    "css":"_css",
+    "java":"_java",
+    "json":"_json",
+    "cs":"_cs",
+    "cpp":"_cpp",
+    "go":"_go"
+  }
+}

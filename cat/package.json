@@ -1,0 +1,51 @@
+{
+  "name": "EO Language",
+  "displayName": "EO Language Support",
+  "description": "Language support and syntax highlighting for EO (.eo files)",
+  "version": "1.0.0",
+  "publisher": "Yazeed",
+  "main": "tasks/extension.js",
+  "icon": "icons/eo.png",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "eo",
+      "aliases": ["eo", "EO"],
+      "extensions": [".eo"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "eo",
+      "scopeName": "source.eo",
+      "path": "./syntaxes/eo.tmLanguage.json"
+    }],
+    "iconThemes": [
+      {
+        "id": "eo-icons",
+        "label": "eo Icons",
+        "path": "./icons/icon-theme.json"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "eo.runCode",
+          "when": "resourceExtname == .eo",
+          "group": "navigation"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "eo.runCode",
+        "title": "Run EO File",
+        "icon": "$(play)"
+      }
+    ]
+  }
+}

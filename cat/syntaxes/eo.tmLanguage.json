@@ -1,0 +1,57 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "EO",
+  "patterns": [
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#comments" }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "storage.type.eo",
+          "match": "\\b(var|const|fn|func|method)\\b"
+        },
+        {
+          "name": "support.function.eo",
+          "match": "\\b(print|input|upper|lower|ivs|len|choice|randint|randfloat|require|round|return)\\b"
+        },
+        {
+          "name": "constant.language.eo",
+          "match": "\\b(True|False|for|while|alias|import|constructor|struct|ñ|if|elif|else)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.eo",
+          "match": "\\b(int|string|float|list|map)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.eo",
+      "begin": "\"",
+      "end": "\"|$\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.eo",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "numbers": {
+      "name": "constant.numeric.eo",
+      "match": "\\b[0-9]+(\\.[0-9]+)?\\b"
+    },
+    "comments": {
+      "name": "comment.line.number-sign.eo",
+      "match": "#.*$"
+    }
+  },
+  "scopeName": "source.eo"
+}
