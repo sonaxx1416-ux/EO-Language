@@ -131,6 +131,8 @@ func main() {
 			
 			conditionPart := strings.TrimSpace(line[len(prefix):headerEnd])
 			conditionPart = strings.ReplaceAll(conditionPart, "ñ", "nil")
+			conditionPart = strings.ReplaceAll(conditionPart, "True", "true")
+			conditionPart = strings.ReplaceAll(conditionPart, "False", "false")
 
 			var goIfLine string
 			if prefix == "else " {
@@ -412,6 +414,8 @@ func main() {
 			}
 
 			cond = strings.ReplaceAll(cond, "ñ", "nil")
+			cond = strings.ReplaceAll(cond, "True", "true")
+			cond = strings.ReplaceAll(cond, "False", "false")
 			post = strings.ReplaceAll(post, "ñ", "nil")
 			translatedLines = append(translatedLines, fmt.Sprintf("for %s; %s; %s {", init, cond, post))
 
@@ -443,6 +447,8 @@ func main() {
 			}
 
 			cond = strings.ReplaceAll(cond, "ñ", "nil")
+			cond = strings.ReplaceAll(cond, "True", "true")
+			cond = strings.ReplaceAll(cond, "False", "false")
 			translatedLines = append(translatedLines, fmt.Sprintf("for %s {", cond))
 
 			for scanner.Scan() {
@@ -465,11 +471,15 @@ func main() {
 		if strings.HasPrefix(line, "print ") {
 			target := strings.TrimSpace(strings.TrimPrefix(line, "print"))
 			target = strings.ReplaceAll(target, "ñ", "nil")
+			target = strings.ReplaceAll(target, "True", "true")
+			target = strings.ReplaceAll(target, "False", "false")
 			translatedLines = append(translatedLines, fmt.Sprintf("fmt.Println(%s)", target))
 
 		} else if strings.HasPrefix(line, "return ") {
 			val := strings.TrimSpace(strings.TrimPrefix(line, "return"))
 			val = strings.ReplaceAll(val, "ñ", "nil")
+			val = strings.ReplaceAll(val, "True", "true")
+			val = strings.ReplaceAll(val, "False", "false")
 			if strings.HasPrefix(val, "(") && strings.HasSuffix(val, ")") {
 				val = strings.TrimSpace(val[1 : len(val)-1])
 			}
@@ -514,6 +524,13 @@ func main() {
 			param := strings.TrimSpace(strings.TrimPrefix(line, "float"))
 			param = strings.ReplaceAll(param, "ñ", "nil")
 			translatedLines = append(translatedLines, fmt.Sprintf("toFloat(%s)", param))
+
+		} else if strings.HasPrefix(line, "bool ") {
+			param := strings.TrimSpace(strings.TrimPrefix(line, "bool"))
+			param = strings.ReplaceAll(param, "ñ", "nil")
+			param = strings.ReplaceAll(param, "True", "true")
+			param = strings.ReplaceAll(param, "False", "false")
+			translatedLines = append(translatedLines, fmt.Sprintf("toBool(%s)", param))
 
 		} else if strings.HasPrefix(line, "round ") {
 			param := strings.TrimSpace(strings.TrimPrefix(line, "round"))
@@ -577,6 +594,10 @@ func main() {
 			var assignment string
 			if rawVal == "ñ" {
 				assignment = fmt.Sprintf("var %s any = nil", varName)
+			} else if rawVal == "True" || rawVal == "true" {
+				assignment = fmt.Sprintf("%s := true", varName)
+			} else if rawVal == "False" || rawVal == "false" {
+				assignment = fmt.Sprintf("%s := false", varName)
 			} else if strings.HasPrefix(rawVal, "input ") {
 				promptText := strings.TrimSpace(strings.TrimPrefix(rawVal, "input"))
 				promptText = strings.ReplaceAll(promptText, "ñ", "nil")
@@ -609,6 +630,12 @@ func main() {
 				param := strings.TrimSpace(strings.TrimPrefix(rawVal, "float"))
 				param = strings.ReplaceAll(rawVal, "ñ", "nil")
 				assignment = fmt.Sprintf("%s := toFloat(%s)", varName, param)
+			} else if strings.HasPrefix(rawVal, "bool ") {
+				param := strings.TrimSpace(strings.TrimPrefix(rawVal, "bool"))
+				param = strings.ReplaceAll(param, "ñ", "nil")
+				param = strings.ReplaceAll(param, "True", "true")
+				param = strings.ReplaceAll(param, "False", "false")
+				assignment = fmt.Sprintf("%s := toBool(%s)", varName, param)
 			} else if strings.HasPrefix(rawVal, "round ") {
 				param := strings.TrimSpace(strings.TrimPrefix(rawVal, "round"))
 				param = strings.ReplaceAll(param, "ñ", "nil")
@@ -651,6 +678,8 @@ func main() {
 				assignment = fmt.Sprintf("%s := randfloat(%s)", varName, param)
 			} else {
 				rawVal = strings.ReplaceAll(rawVal, "ñ", "nil")
+				rawVal = strings.ReplaceAll(rawVal, "True", "true")
+				rawVal = strings.ReplaceAll(rawVal, "False", "false")
 				if strings.HasPrefix(rawVal, "[") && strings.HasSuffix(rawVal, "]") {
 					rawVal = "[]any{" + rawVal[1:len(rawVal)-1] + "}"
 				}
@@ -698,6 +727,13 @@ func main() {
 				lhs := strings.TrimSpace(parts[0])
 				param := strings.TrimSpace(parts[1])
 				line = fmt.Sprintf("%s = toFloat(%s)", lhs, param)
+			} else if strings.Contains(line, "= bool ") {
+				parts := strings.SplitN(line, "= bool ", 2)
+				lhs := strings.TrimSpace(parts[0])
+				param := strings.TrimSpace(parts[1])
+				param = strings.ReplaceAll(param, "True", "true")
+				param = strings.ReplaceAll(param, "False", "false")
+				line = fmt.Sprintf("%s = toBool(%s)", lhs, param)
 			} else if strings.Contains(line, "= round ") {
 				parts := strings.SplitN(line, "= round ", 2)
 				lhs := strings.TrimSpace(parts[0])
@@ -745,6 +781,8 @@ func main() {
 			}
 			
 			line = strings.ReplaceAll(line, "ñ", "nil")
+			line = strings.ReplaceAll(line, "True", "true")
+			line = strings.ReplaceAll(line, "False", "false")
 			if strings.Contains(line, "=") {
 				eqParts := strings.SplitN(line, "=", 2)
 				if len(eqParts) == 2 {
@@ -769,6 +807,8 @@ func main() {
 
 func translateInnerLine(line string, translatedLines *[]string) {
 	if strings.HasPrefix(line, "if ") || strings.HasPrefix(line, "elif ") || strings.HasPrefix(line, "else ") {
+		line = strings.ReplaceAll(line, "True", "true")
+		line = strings.ReplaceAll(line, "False", "false")
 		*translatedLines = append(*translatedLines, "\t"+line)
 		return
 	}
@@ -810,10 +850,14 @@ func translateInnerLine(line string, translatedLines *[]string) {
 	if strings.HasPrefix(line, "print ") {
 		target := strings.TrimSpace(strings.TrimPrefix(line, "print"))
 		target = strings.ReplaceAll(target, "ñ", "nil")
+		target = strings.ReplaceAll(target, "True", "true")
+		target = strings.ReplaceAll(target, "False", "false")
 		*translatedLines = append(*translatedLines, fmt.Sprintf("\tfmt.Println(%s)", target))
 	} else if strings.HasPrefix(line, "return ") {
 		val := strings.TrimSpace(strings.TrimPrefix(line, "return"))
 		val = strings.ReplaceAll(val, "ñ", "nil")
+		val = strings.ReplaceAll(val, "True", "true")
+		val = strings.ReplaceAll(val, "False", "false")
 		if strings.HasPrefix(val, "(") && strings.HasSuffix(val, ")") {
 			val = strings.TrimSpace(val[1 : len(val)-1])
 		}
@@ -850,6 +894,12 @@ func translateInnerLine(line string, translatedLines *[]string) {
 		param := strings.TrimSpace(strings.TrimPrefix(line, "float"))
 		param = strings.ReplaceAll(param, "ñ", "nil")
 		*translatedLines = append(*translatedLines, fmt.Sprintf("\ttoFloat(%s)", param))
+	} else if strings.HasPrefix(line, "bool ") {
+		param := strings.TrimSpace(strings.TrimPrefix(line, "bool"))
+		param = strings.ReplaceAll(param, "ñ", "nil")
+		param = strings.ReplaceAll(param, "True", "true")
+		param = strings.ReplaceAll(param, "False", "false")
+		*translatedLines = append(*translatedLines, fmt.Sprintf("\ttoBool(%s)", param))
 	} else if strings.HasPrefix(line, "round ") {
 		param := strings.TrimSpace(strings.TrimPrefix(line, "round"))
 		param = strings.ReplaceAll(param, "ñ", "nil")
@@ -902,6 +952,10 @@ func translateInnerLine(line string, translatedLines *[]string) {
 			rawVal := strings.TrimSpace(strings.TrimPrefix(parts[2], "="))
 			if rawVal == "ñ" {
 				*translatedLines = append(*translatedLines, fmt.Sprintf("\tvar %s any = nil", varName))
+			} else if rawVal == "True" || rawVal == "true" {
+				*translatedLines = append(*translatedLines, fmt.Sprintf("\t%s := true", varName))
+			} else if rawVal == "False" || rawVal == "false" {
+				*translatedLines = append(*translatedLines, fmt.Sprintf("\t%s := false", varName))
 			} else if strings.HasPrefix(rawVal, "input ") {
 				promptText := strings.TrimSpace(strings.TrimPrefix(rawVal, "input"))
 				promptText = strings.ReplaceAll(promptText, "ñ", "nil")
@@ -924,16 +978,22 @@ func translateInnerLine(line string, translatedLines *[]string) {
 				*translatedLines = append(*translatedLines, fmt.Sprintf("\t%s := len(%s)", varName, param))
 			} else if strings.HasPrefix(rawVal, "string ") {
 				param := strings.TrimSpace(strings.TrimPrefix(rawVal, "string"))
-				param = strings.ReplaceAll(rawVal, "ñ", "nil")
+				param = strings.ReplaceAll(param, "ñ", "nil")
 				*translatedLines = append(*translatedLines, fmt.Sprintf("\t%s := toString(%s)", varName, param))
 			} else if strings.HasPrefix(rawVal, "int ") {
 				param := strings.TrimSpace(strings.TrimPrefix(rawVal, "int"))
-				param = strings.ReplaceAll(rawVal, "ñ", "nil")
+				param = strings.ReplaceAll(param, "ñ", "nil")
 				*translatedLines = append(*translatedLines, fmt.Sprintf("\t%s := toInt(%s)", varName, param))
 			} else if strings.HasPrefix(rawVal, "float ") {
 				param := strings.TrimSpace(strings.TrimPrefix(rawVal, "float"))
-				param = strings.ReplaceAll(rawVal, "ñ", "nil")
+				param = strings.ReplaceAll(param, "ñ", "nil")
 				*translatedLines = append(*translatedLines, fmt.Sprintf("\t%s := toFloat(%s)", varName, param))
+			} else if strings.HasPrefix(rawVal, "bool ") {
+				param := strings.TrimSpace(strings.TrimPrefix(rawVal, "bool"))
+				param = strings.ReplaceAll(param, "ñ", "nil")
+				param = strings.ReplaceAll(param, "True", "true")
+				param = strings.ReplaceAll(param, "False", "false")
+				*translatedLines = append(*translatedLines, fmt.Sprintf("\t%s := toBool(%s)", varName, param))
 			} else if strings.HasPrefix(rawVal, "round ") {
 				param := strings.TrimSpace(strings.TrimPrefix(rawVal, "round"))
 				param = strings.ReplaceAll(param, "ñ", "nil")
@@ -976,6 +1036,8 @@ func translateInnerLine(line string, translatedLines *[]string) {
 				*translatedLines = append(*translatedLines, fmt.Sprintf("\t%s := randfloat(%s)", varName, param))
 			} else {
 				rawVal = strings.ReplaceAll(rawVal, "ñ", "nil")
+				rawVal = strings.ReplaceAll(rawVal, "True", "true")
+				rawVal = strings.ReplaceAll(rawVal, "False", "false")
 				if strings.HasPrefix(rawVal, "[") && strings.HasSuffix(rawVal, "]") {
 					rawVal = "[]any{" + rawVal[1:len(rawVal)-1] + "}"
 				}
@@ -1027,8 +1089,17 @@ func translateInnerLine(line string, translatedLines *[]string) {
 				}
 			}
 			line = fmt.Sprintf("%s = randfloat(%s)", lhs, param)
+		} else if strings.Contains(line, "= bool ") {
+			parts := strings.SplitN(line, "= bool ", 2)
+			lhs := strings.TrimSpace(parts[0])
+			param := strings.TrimSpace(parts[1])
+			param = strings.ReplaceAll(param, "True", "true")
+			param = strings.ReplaceAll(param, "False", "false")
+			line = fmt.Sprintf("%s = toBool(%s)", lhs, param)
 		}
 		line = strings.ReplaceAll(line, "ñ", "nil")
+		line = strings.ReplaceAll(line, "True", "true")
+		line = strings.ReplaceAll(line, "False", "false")
 		if strings.Contains(line, "=") {
 			eqParts := strings.SplitN(line, "=", 2)
 			if len(eqParts) == 2 {
@@ -1156,6 +1227,33 @@ func toFloat(v any) float64 {
         return f
     default:
         return 0.0
+    }
+}
+
+func toBool(v any) bool {
+    switch val := v.(type) {
+    case bool:
+        return val
+    case string:
+        if val == "" {
+            return false
+        }
+        for _, r := range val {
+            if !((r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z')) {
+                return false
+            }
+        }
+        return true
+    case int:
+        return val > 0
+    case int64:
+        return val > 0
+    case float64:
+        return val > 0.0
+    case float32:
+        return float64(val) > 0.0
+    default:
+        return false
     }
 }
 
