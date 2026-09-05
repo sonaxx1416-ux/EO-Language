@@ -20,7 +20,7 @@ function activate(context) {
                 shellPath: 'cmd.exe'
             });
             terminal.show();
-            terminal.sendText(`go run "${eoGoPath}" "${filePath}"`);
+            terminal.sendText(`"eo.exe" "${filePath}"`);
         });
     });
 
