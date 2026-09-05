@@ -807,9 +807,46 @@ func main() {
 
 func translateInnerLine(line string, translatedLines *[]string) {
 	if strings.HasPrefix(line, "if ") || strings.HasPrefix(line, "elif ") || strings.HasPrefix(line, "else ") {
-		line = strings.ReplaceAll(line, "True", "true")
-		line = strings.ReplaceAll(line, "False", "false")
-		*translatedLines = append(*translatedLines, "\t"+line)
+		prefix := "if "
+		if strings.HasPrefix(line, "elif ") {
+			prefix = "elif "
+		} else if strings.HasPrefix(line, "else ") {
+			prefix = "else "
+		}
+
+		headerEnd := strings.Index(line, "{")
+		if headerEnd == -1 {
+			headerEnd = len(line)
+		}
+		
+		conditionPart := strings.TrimSpace(line[len(prefix):headerEnd])
+		conditionPart = strings.ReplaceAll(conditionPart, "ñ", "nil")
+		conditionPart = strings.ReplaceAll(conditionPart, "True", "true")
+		conditionPart = strings.ReplaceAll(conditionPart, "False", "false")
+
+		var goIfLine string
+		if prefix == "else " {
+			if conditionPart != "" {
+				if strings.HasPrefix(conditionPart, "(") && strings.HasSuffix(conditionPart, ")") {
+					conditionPart = strings.TrimSpace(conditionPart[1 : len(conditionPart)-1])
+				}
+				goIfLine = fmt.Sprintf("\telse if %s {", conditionPart)
+			} else {
+				goIfLine = "\telse {"
+			}
+		} else if prefix == "elif " {
+			if strings.HasPrefix(conditionPart, "(") && strings.HasSuffix(conditionPart, ")") {
+				conditionPart = strings.TrimSpace(conditionPart[1 : len(conditionPart)-1])
+			}
+			goIfLine = fmt.Sprintf("\telse if %s {", conditionPart)
+		} else {
+			if strings.HasPrefix(conditionPart, "(") && strings.HasSuffix(conditionPart, ")") {
+				conditionPart = strings.TrimSpace(conditionPart[1 : len(conditionPart)-1])
+			}
+			goIfLine = fmt.Sprintf("\tif %s {", conditionPart)
+		}
+
+		*translatedLines = append(*translatedLines, goIfLine)
 		return
 	}
 
