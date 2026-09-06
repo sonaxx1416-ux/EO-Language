@@ -156,7 +156,16 @@ func main() {
 				goIfLine = fmt.Sprintf("if %s {", conditionPart)
 			}
 
-			translatedLines = append(translatedLines, goIfLine)
+			if (strings.HasPrefix(goIfLine, "else if ") || strings.HasPrefix(goIfLine, "else {")) && len(translatedLines) > 0 {
+				lastIdx := len(translatedLines) - 1
+				if strings.HasSuffix(translatedLines[lastIdx], "}") {
+					translatedLines[lastIdx] = translatedLines[lastIdx] + " " + goIfLine
+				} else {
+					translatedLines = append(translatedLines, goIfLine)
+				}
+			} else {
+				translatedLines = append(translatedLines, goIfLine)
+			}
 
 			for scanner.Scan() {
 				innerLine := strings.TrimSpace(scanner.Text())
@@ -846,7 +855,16 @@ func translateInnerLine(line string, translatedLines *[]string) {
 			goIfLine = fmt.Sprintf("\tif %s {", conditionPart)
 		}
 
-		*translatedLines = append(*translatedLines, goIfLine)
+		if (strings.HasPrefix(strings.TrimSpace(goIfLine), "else if ") || strings.HasPrefix(strings.TrimSpace(goIfLine), "else {")) && len(*translatedLines) > 0 {
+			lastIdx := len(*translatedLines) - 1
+			if strings.HasSuffix((*translatedLines)[lastIdx], "}") {
+				(*translatedLines)[lastIdx] = (*translatedLines)[lastIdx] + " " + strings.TrimSpace(goIfLine)
+			} else {
+				*translatedLines = append(*translatedLines, goIfLine)
+			}
+		} else {
+			*translatedLines = append(*translatedLines, goIfLine)
+		}
 		return
 	}
 
@@ -1007,11 +1025,11 @@ func translateInnerLine(line string, translatedLines *[]string) {
 				*translatedLines = append(*translatedLines, fmt.Sprintf("\t%s := upper(%s)", varName, param))
 			} else if strings.HasPrefix(rawVal, "ivs ") {
 				param := strings.TrimSpace(strings.TrimPrefix(rawVal, "ivs"))
-				param = strings.ReplaceAll(param, "ñ", "nil")
+				param = strings.ReplaceAll(rawVal, "ñ", "nil")
 				*translatedLines = append(*translatedLines, fmt.Sprintf("\t%s := ivs(%s)", varName, param))
 			} else if strings.HasPrefix(rawVal, "len ") {
 				param := strings.TrimSpace(strings.TrimPrefix(rawVal, "len"))
-				param = strings.ReplaceAll(param, "ñ", "nil")
+				param = strings.ReplaceAll(rawVal, "ñ", "nil")
 				*translatedLines = append(*translatedLines, fmt.Sprintf("\t%s := len(%s)", varName, param))
 			} else if strings.HasPrefix(rawVal, "string ") {
 				param := strings.TrimSpace(strings.TrimPrefix(rawVal, "string"))
